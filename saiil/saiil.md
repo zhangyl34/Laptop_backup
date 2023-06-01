@@ -92,7 +92,7 @@ __Surgical Endoscopy 2022__
 针对腹腔镜胆囊切除术。
 parkland grade scale (PGS) 1-5 反应了手术开始时胆囊的炎症程度，是评估手术难度的指标之一。
 
-1. 本文训练了一个评估 PGS 的网络，并测试了网络的性能。
+1. 本文训练了一个评估 PGS 的 ResNet50 网络，并测试了网络的性能。
 2. 本文利用贝叶斯回归模型，探究了 PGS+surgeon 与手术持续时间，术中胆囊损伤概率，能否获得 critical view of safety (CVS) 三者之间的关系。
 
 <img src="img/cvs.png" width=40%>
