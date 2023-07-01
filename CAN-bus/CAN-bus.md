@@ -128,11 +128,35 @@
 * __同步传输__：又分为周期传输（循环）和非周期传输（无循环）。周期传输是通过接收同步对象（SYNC）来实现，可以设置 1~240 个同步对象触发；非周期传输是由远程帧预触发或者由设备子协议中规定的对象特定事件预触发传送。
 * RPDO 通信参数 __1400h to 15FFh__，映射参数 __1600h to 17FFh__，数据存放为 __2000h__ 之后厂商自定义区域；TPDO 通信参数 __1800h to 19FFh__，映射参数 __1A00h to 1BFFh__，数据存放为 __2000h__ 之后厂商自定义区域。
 
-<img src="img/open_table_7_2.jpg" width=60%>
+<img src="img/open_table_7_2.png" width=60%>
 
 * 默认情况下，TPDO1 对应通信参数 1800h，映射参数 1A00h；TPDO2 对应通信参数 1801h，映射参数 1A01h；TPDO3 对应通信参数 1802h，映射参数 1A02h；TPDO4 对应通信参数 1803h，映射参数 1A03h。
 
 <img src="img/open_table_7_3.png" width=60%>
+
+__如何用 PDO 配置电机转速：__
+1. 先用 SDO 配置 iPOS RPDO 的映射参数。使用 iPOS 自己的 Node-ID，即 COB-ID=300h+Node-ID。
+2. 配完之后，往 CAN 总线下发 COB-ID=300h+Node-ID 的报文，即可控制对应电机运动。
+
+```c++ {.line-numbers}
+U32 val = 0x80000300U+node_id;
+writeOD((unsigned char*)&val, 4, 0x1401, 1);  // RPDO2 COB-ID，啥意思？
+
+val = 0x0U;
+writeOD((unsigned char*)&val, 1, 0x1601, 0);  // RPDO2 的映射参数条目数量先归 0
+
+val = 0x607E0008U;
+writeOD((unsigned char*)&val, 4, 0x1601, 1);  // RPDO2 的映射参数 1，极性，1 byte
+
+val = 0x60FF0020U;
+writeOD((unsigned char*)&val, 4, 0x1601, 2);  // RPDO2 的映射参数 2，速度，4 byte
+
+val = 0x2U;
+writeOD((unsigned char*)&val, 1, 0x1601, 0);  // RPDO2 的映射参数条目数量设为 2
+
+val = 0x00000300U+node_id;
+writeOD((unsigned char*)&val, 4, 0x1401, 1);  // RPDO2 COB-ID，设回 300+node_id
+```
 
 ### 服务数据对象 SDO
 
