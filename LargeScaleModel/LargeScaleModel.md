@@ -23,6 +23,10 @@
     - [Artificial Intelligence in Surgery: Promises and Perils](#artificial-intelligence-in-surgery-promises-and-perils)
   - [有意思的网站](#有意思的网站)
 - [How roboticists are thinking about generative AI?](#how-roboticists-are-thinking-about-generative-ai)
+  - [Generative Modeling by Estimating Gradients of the Data Distribution](#generative-modeling-by-estimating-gradients-of-the-data-distribution)
+    - [神经网络在学什么？](#神经网络在学什么)
+    - [为什么要用这种退火的方法？](#为什么要用这种退火的方法)
+    - [为什么要加高斯噪声？](#为什么要加高斯噪声)
   - [Denoising Diffusion Probabilistic Models](#denoising-diffusion-probabilistic-models)
   - [Diffusion Policy: Visuomotor Policy Learning via Action Diffusion](#diffusion-policy-visuomotor-policy-learning-via-action-diffusion)
 
@@ -288,13 +292,55 @@ https://agentgpt.reworkd.ai/zh
 
 > source: https://techcrunch.com/2023/10/14/how-roboticists-are-thinking-about-generative-ai/
 
+## Generative Modeling by Estimating Gradients of the Data Distribution
+
+### 神经网络在学什么？
+
+<img src="img/udm_5.png" width=100%>
+
+> Luo, Calvin. "Understanding diffusion models: A unified perspective." arXiv preprint arXiv:2208.11970 (2022).
+
+图中有两个关键的概率分布：
+$q(x_t|x_{t-1})=\mathcal{N}(x_t;\sqrt{\alpha_t}x_{t-1},(1-\alpha_t) I)$
+$q(x_{t-1}|x_t,x_0)=\mathcal{N}(x_{t-1};\mu,\Sigma I)$
+其中 $\alpha$ 相当于高斯噪声的方差：
+$\Sigma=\frac{(1-\alpha_t)(1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_{t}}$ 已知
+$\mu=\frac{\sqrt{\alpha_t}(1-\bar{\alpha}_{t-1})x_t+\sqrt{\bar{\alpha}_{t-1}}(1-\alpha_t)x_0}{1-\bar{\alpha}_t}$ 未知
+神经网络的目标是学习 $p(x_{t-1}|x_t)$，使其尽可能地逼近 $q(x_{t-1}|x_t,x_0)$。本质上是在学习关于 $x_0$ 的一个隐势场
+
+<img src="img/ys_sbgm.png" width=100%>
+
+> source: http://yang-song.net/blog/2021/score/
+
+### 为什么要用这种退火的方法？
+
+追溯到分子的布朗运动：
+$m\ddot x=-\lambda \dot x + \eta(t); \eta(t)\in \mathcal{N}(0,\sigma ^2 I)$
+可以抽象为：
+$dx(t)=-\nabla U(x(t))dt + \sigma dBt; dBt\in \mathcal{N}(0,dt I)$；U 即神经网路学习的隐势场
+当时间趋向无穷，x 最终会稳定下来，可求得：
+$p(x)=\frac{exp(-2U(x)/\sigma^2)}{Z}$；Z 为归一化系数
+
+由于 Z 的计算比较麻烦，所以转而学习：
+$\nabla_x \log p(x) = - \frac{2}{\sigma^2} \nabla_x U(x)$
+因此出现了这种退火的方法：
+$x_{i+1} \leftarrow{x_i + \epsilon \nabla_x \log p(x) + \sqrt{2\epsilon} z_i}; z_i\in \mathcal{N}(0,I)$
+
+### 为什么要加高斯噪声？
+
+训练网络用的损失函数一般设计为：
+$\mathbb{E}_{p(x)}[\| \nabla_x \log p(x)-s_\theta (x) \|_2^2] = \int p(x) \| \nabla_x \log p(x) - s_\theta (x) \|_2^2dx$
+
+当图像太有规律时，隐势场的大部分区域都没有得到训练。
+
+<img src="img/ys_esao.png" width=100%>
+<img src="img/ys_esaa.png" width=100%>
+
 ## Denoising Diffusion Probabilistic Models
 
 <img src="img/ddpm_6.png" width=100%>
 
 > Ho, Jonathan, Ajay Jain, and Pieter Abbeel. "Denoising diffusion probabilistic models." Advances in neural information processing systems 33 (2020): 6840-6851.
-
-$$\mathbf{x}^{k-1} = \alpha (\mathbf{x}^{k} - \gamma \epsilon_\theta (\mathbf{x}^k, k) + \mathcal{N}(0,\sigma^2 I)) $$
 
 
 ## Diffusion Policy: Visuomotor Policy Learning via Action Diffusion
@@ -308,7 +354,7 @@ __input:__ 前几帧的观测 + robot pose
 __output:__ 未来几帧的轨迹规划
 __数据集：__
 
-
+$$\mathbf{x}^{k-1} = \alpha (\mathbf{x}^{k} - \gamma \epsilon_\theta (\mathbf{x}^k, k) + \mathcal{N}(0,\sigma^2 I)) $$
 
 
 
