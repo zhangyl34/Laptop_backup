@@ -1,4 +1,3 @@
-
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
@@ -21,14 +20,16 @@
     - [Microsoft 365 Copilot](#microsoft-365-copilot)
     - [AutoGPT](#autogpt)
     - [Artificial Intelligence in Surgery: Promises and Perils](#artificial-intelligence-in-surgery-promises-and-perils)
-  - [有意思的网站](#有意思的网站)
+    - [A Survey of Large Language Models for Autonomous Driving](#a-survey-of-large-language-models-for-autonomous-driving)
+  - [一些网站](#一些网站)
 - [How roboticists are thinking about generative AI?](#how-roboticists-are-thinking-about-generative-ai)
   - [Generative Modeling by Estimating Gradients of the Data Distribution](#generative-modeling-by-estimating-gradients-of-the-data-distribution)
-    - [神经网络在学什么？](#神经网络在学什么)
-    - [为什么要用这种退火的方法？](#为什么要用这种退火的方法)
-    - [为什么要加高斯噪声？](#为什么要加高斯噪声)
-  - [Denoising Diffusion Probabilistic Models](#denoising-diffusion-probabilistic-models)
   - [Diffusion Policy: Visuomotor Policy Learning via Action Diffusion](#diffusion-policy-visuomotor-policy-learning-via-action-diffusion)
+  - [一些数据集](#一些数据集)
+    - [What Matters in Learning from Offline Human Demonstrations for Robot Manipulation](#what-matters-in-learning-from-offline-human-demonstrations-for-robot-manipulation)
+    - [Implicit Behavioral Cloning](#implicit-behavioral-cloning)
+    - [Relay Policy Learning: Solving Long-Horizon Tasks via Imitation and Reinforcement Learning.](#relay-policy-learning-solving-long-horizon-tasks-via-imitation-and-reinforcement-learning)
+  - [测试](#测试)
 
 <!-- /code_chunk_output -->
 
@@ -274,7 +275,49 @@ __问题：__
 
 > Hashimoto, Daniel A., et al. "Artificial intelligence in surgery: promises and perils." Annals of surgery 268.1 (2018): 70.
 
-## 有意思的网站
+### A Survey of Large Language Models for Autonomous Driving
+
+传统的自动驾驶方案往往被划分为若干子任务模块：感知模块（周围物体检测、跟踪、语义分割）、预测模块（周围物体轨迹预测）、规划模块（自身轨迹规划）。这种模块化的结构看似更加可靠和安全，但也存在一系列的问题：模块之间的信息传递必然存在损失；不同模块对同一信息的提取会造成计算资源的浪费；模块之间的信息传递会累计误差。
+
+大语言模型（如 GPT-4）如何集成进自动驾驶方案中？
+
+大语言模型对开放世界的认知和推理能力是得到证实的。这个特性能够增强自动驾驶方案的可解释性。
+
+<img src="img/fad_2.png" width=100%>
+
+__RT-2 Robotic Transformer 2__
+
+<img src="img/rt2_1.png" width=100%>
+
+用闭环的方法，利用 GPT 做运动规划。
+
+__MTD-GPT__
+
+<img src="img/mtd_2.png" width=60%>
+
+<img src="img/mtd_3.png" width=80%>
+
+用于车辆在十字路口的运动规划。
+首先训练若干 expert 网络，每个 expert 专注于特定的任务，如：左转、直行、右转。网络输入为 observation，输出为 action 和 reward，皆为 token 形式。
+其次再用 GPT 从若干 expert 的输出中挑选最合适的路径。
+
+__Language Prompt__
+
+<img src="img/promptTrack_5.png" width=100%>
+
+输入多视角下的多帧连续图像，并且输入提示词（多模态），如：“正在右转的车辆”；输出目标物体的 Bounding Box。
+
+__HiLM-D__
+
+<img src="img/hilmd_3.png" width=100%>
+
+一次性把感知、预测、规划都搞定。
+
+大型模块 Vision Transformer（用于逐帧提取图像特征），LLM 等都不参与训练。ST-Adapter 用于将逐帧特征转化为包含时间信息的特征。
+
+High-Resolution 模块中，Enumeration Module 的作用在于根据 prompt 关注图像的细小特征（如行人、信号灯），
+
+## 一些网站
 
 __ChatGPT, Generative AI and GPT-3 Apps__
 https://gpt3demo.com/
@@ -294,7 +337,7 @@ https://agentgpt.reworkd.ai/zh
 
 ## Generative Modeling by Estimating Gradients of the Data Distribution
 
-### 神经网络在学什么？
+__神经网络在学什么？__
 
 <img src="img/udm_5.png" width=100%>
 
@@ -312,7 +355,7 @@ $\mu=\frac{\sqrt{\alpha_t}(1-\bar{\alpha}_{t-1})x_t+\sqrt{\bar{\alpha}_{t-1}}(1-
 
 > source: http://yang-song.net/blog/2021/score/
 
-### 为什么要用这种退火的方法？
+__为什么要用退火的方法？__
 
 追溯到分子的布朗运动：
 $m\ddot x=-\lambda \dot x + \eta(t); \eta(t)\in \mathcal{N}(0,\sigma ^2 I)$
@@ -326,7 +369,7 @@ $\nabla_x \log p(x) = - \frac{2}{\sigma^2} \nabla_x U(x)$
 因此出现了这种退火的方法：
 $x_{i+1} \leftarrow{x_i + \epsilon \nabla_x \log p(x) + \sqrt{2\epsilon} z_i}; z_i\in \mathcal{N}(0,I)$
 
-### 为什么要加高斯噪声？
+__高斯噪声的另一个好处__
 
 训练网络用的损失函数一般设计为：
 $\mathbb{E}_{p(x)}[\| \nabla_x \log p(x)-s_\theta (x) \|_2^2] = \int p(x) \| \nabla_x \log p(x) - s_\theta (x) \|_2^2dx$
@@ -336,12 +379,9 @@ $\mathbb{E}_{p(x)}[\| \nabla_x \log p(x)-s_\theta (x) \|_2^2] = \int p(x) \| \na
 <img src="img/ys_esao.png" width=100%>
 <img src="img/ys_esaa.png" width=100%>
 
-## Denoising Diffusion Probabilistic Models
+__网络的设计__
 
-<img src="img/ddpm_6.png" width=100%>
-
-> Ho, Jonathan, Ajay Jain, and Pieter Abbeel. "Denoising diffusion probabilistic models." Advances in neural information processing systems 33 (2020): 6840-6851.
-
+<img src="img/ys_neal1.png" width=100%>
 
 ## Diffusion Policy: Visuomotor Policy Learning via Action Diffusion
 
@@ -350,11 +390,47 @@ $\mathbb{E}_{p(x)}[\| \nabla_x \log p(x)-s_\theta (x) \|_2^2] = \int p(x) \| \na
 > Chi, Cheng, et al. "Diffusion policy: Visuomotor policy learning via action diffusion." arXiv preprint arXiv:2303.04137 (2023).
 
 __task:__ 移动积木到指定位置
-__input:__ 前几帧的观测 + robot pose
-__output:__ 未来几帧的轨迹规划
-__数据集：__
 
-$$\mathbf{x}^{k-1} = \alpha (\mathbf{x}^{k} - \gamma \epsilon_\theta (\mathbf{x}^k, k) + \mathcal{N}(0,\sigma^2 I)) $$
+__input:__ 前几帧的观测 + 未来几帧的待优化轨迹
+
+__output:__ 未来几帧的优化后轨迹
+
+__网络结构：__
+<img src="img/diffusion_network.png" width=100%>
+<img src="img/diffusion_crb.png" width=70%>
+
+__关键函数：__
+==DDPMScheduler.add_noise(naction, noise, timestep)==
+对应前向加噪：$x_t = \sqrt{\bar{\alpha}_t}x_0 + \sqrt{1-\bar{\alpha}_t}\tilde{\epsilon}_0; \tilde{\epsilon}_0 \in \mathcal{N}(0,I)$
+
+==Loss function: $MSE(\epsilon_\theta(x_t,t), \tilde{\epsilon}_0)$==
+
+==DDPMScheduler.step(noise_pred, timestep, naction)==
+对应反向去噪：$x_{t-1}=\frac{1}{\sqrt{\alpha_t}}(x_t-\frac{1-\alpha_t}{\sqrt{1-\bar{\alpha}_t}}\epsilon_\theta(x_t,t))+\sqrt{\Sigma(t)}\tilde{\epsilon}_0$
+
+__other notes:__
+1. the policy extracts the visual representation once regardless of the denoising iterations.
+2. scalability to high-dimension output spcaces -> infer a sequence of future actions.
+3. We recommend starting with the CNN-based diffusion policy implementation as the first attempt at a new task. If performance is low due to task complexity or hight-rate action changes, then the Time-series Diffusion Transformer formulation can be used to potentially improve performance at the cost of additional training.
+
+## 一些数据集
+
+### What Matters in Learning from Offline Human Demonstrations for Robot Manipulation
+
+> source: https://robomimic.github.io/study/
+
+### Implicit Behavioral Cloning
+
+> source: https://implicitbc.github.io/
+
+### Relay Policy Learning: Solving Long-Horizon Tasks via Imitation and Reinforcement Learning.
+
+> source: https://relay-policy-learning.github.io/
+
+## 测试
+
+__environment:__
 
 
+__result:__
 
