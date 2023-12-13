@@ -315,7 +315,7 @@ __HiLM-D__
 
 大型模块 Vision Transformer（用于逐帧提取图像特征），LLM 等都不参与训练。ST-Adapter 用于将逐帧特征转化为包含时间信息的特征。
 
-High-Resolution 模块中，Enumeration Module 的作用在于根据 prompt 关注图像的细小特征（如行人、信号灯），
+High-Resolution 模块中，Enumeration Module 的作用在于根据 prompt 关注图像的细小特征（如行人、信号灯）。
 
 ## 一些网站
 
