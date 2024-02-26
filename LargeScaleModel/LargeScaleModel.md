@@ -24,6 +24,7 @@
   - [一些网站](#一些网站)
 - [How roboticists are thinking about generative AI?](#how-roboticists-are-thinking-about-generative-ai)
   - [Generative Modeling by Estimating Gradients of the Data Distribution](#generative-modeling-by-estimating-gradients-of-the-data-distribution)
+  - [Denoising Diffusion Probabilistic Models](#denoising-diffusion-probabilistic-models)
   - [Diffusion Policy: Visuomotor Policy Learning via Action Diffusion](#diffusion-policy-visuomotor-policy-learning-via-action-diffusion)
   - [一些数据集](#一些数据集)
     - [What Matters in Learning from Offline Human Demonstrations for Robot Manipulation](#what-matters-in-learning-from-offline-human-demonstrations-for-robot-manipulation)
@@ -383,6 +384,10 @@ __网络的设计__
 
 <img src="img/ys_neal1.png" width=100%>
 
+## Denoising Diffusion Probabilistic Models
+
+https://aistudio.baidu.com/projectdetail/5219878?channelType=0&amp;channel=0
+
 ## Diffusion Policy: Visuomotor Policy Learning via Action Diffusion
 
 <img src="img/diffusion_3.png" width=100%>
@@ -429,8 +434,6 @@ __other notes:__
 
 ## 测试
 
-__environment:__
-
-
-__result:__
+这里有在虚拟场景下推积木的 demo：
+https://github.com/real-stanford/diffusion_policy/tree/main
 
