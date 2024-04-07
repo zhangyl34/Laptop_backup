@@ -12,8 +12,8 @@
 - [Category-Level Articulated Object Pose Estimation](#category-level-articulated-object-pose-estimation)
 - [CAPTRA: CAtegory-level Pose Tracking for Rigid and Articulated Objects from Point Clouds](#captra-category-level-pose-tracking-for-rigid-and-articulated-objects-from-point-clouds)
 - [GraphRegNet: Deep Graph Regularisation Networks on Sparse Keypoints for Dense Registration of 3D Lung CTs](#graphregnet-deep-graph-regularisation-networks-on-sparse-keypoints-for-dense-registration-of-3d-lung-cts)
+- [FoundationPose: Unified 6D Pose Estimation and Tracking of Novel Objects](#foundationpose-unified-6d-pose-estimation-and-tracking-of-novel-objects)
 - [点云位姿估计测试](#点云位姿估计测试)
-  - [CAPTRA](#captra)
 
 <!-- /code_chunk_output -->
 
@@ -166,6 +166,41 @@ $I_F, I_M$ 是一对吸气和呼气时的 CT 扫描影像。作者希望学到�
 4. 使用 GraphRegNet，由每一张损失热图 C 预测一个位移场 Ds。GraphRegNet 首先是 CNN 编码层，分别作用在每一张损失热图 C 上提取特征向量；第二部分可以看作是 2D 点云的神经网络，同时学到每个特征点 P 的特征向量以及它们之间的位置关系；最后一个部分是 CNN 解码层，分别作用在每个特征 P 上，生成一个位移场 Ds，进而可以确定每个特征 P 的位移量。三线性插值后，得到稠密的位移图。
 5. 于是可以根据位移图将 $F_M$ 位移为 $F_F$ 的预测值，并与 $F_F$ 的真值进行比较，作为损失函数用于训练。
 
+## FoundationPose: Unified 6D Pose Estimation and Tracking of Novel Objects
+
+__CVPR 2024 NVIDIA__
+
+__contribution:__
+1. We present a unified framework for both ==pose estimation and tracking== for ==novel objects==, supporting both model-based and model-free setups. An object-centric neural implicit representation for effective novel view synthesis bridges the gap between the two setups.
+2. We propose a ==LLM-aided synthetic data generation pipeline== which scales up the variety of 3D training assets by diverse texture augmentation.
+3. Our novel design of ==transformer-based network architectures== and contrastive learning formulation leads to strong generalization when trained solely on synthetic data.
+
+<img src="img/foundation_1.png" width=100%>
+
+<img src="img/foundation_2.png" width=100%>
+
+__3.1. Language-aided Data Generation at Scale__
+
+是一种虚拟数据集生成方法。如果在模型上随机贴 texture，虚拟数据集往往会看起来非常不真实。本文利用 LLM 和 Diffusion model 生成更加逼真的 texture。
+
+__3.2. Neural Object Modeling__
+
+object field 用两个映射来表示：Geometry Network + Appearance Network。
+
+训练好的 object field 用于代替 3D model。
+
+注意：这两个网络的训练需要一组 RGBD 图像。
+
+__3.3. Pose Hypothesis Generation__
+
+* 先目标检测，确定大致的 translation；
+* uniformly rotations sampling;
+* pose refinement;
+
+__3.4. Pose Selection__
+
+使用 transformer 对每一个 hypothesis 评分，选出置信度最高的 pose。
+
 ## 点云位姿估计测试
 
 __位置：__
@@ -259,8 +294,6 @@ $$L = L_{class} + L_{regression}$$
 平均误差：4.16°。
 
 <img src="img/max_error.png" width=40%>
-
-### CAPTRA
 
 
 
